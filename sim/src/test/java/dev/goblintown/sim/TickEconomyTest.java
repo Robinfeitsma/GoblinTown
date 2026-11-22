@@ -112,12 +112,13 @@ class TickEconomyTest {
     @Test
     void rateConversionMatchesDesignDocStructure() {
         Balance balance = TestSupport.balance();
-        // docs/03 §Formulas: per-tick = whole-units-per-second / 60, truncated
-        // once at load (DR-0003) — the sim never re-derives it per tick.
+        // docs/03 §Formulas / docs/08 (approved): per-tick = whole-units-per-
+        // second / 60, truncated once at load (DR-0003) — the sim never
+        // re-derives it per tick.
         assertThat(balance.role("gatherer").amountPerTickFixed())
-                .isEqualTo(Fixed.fromUnits(6) / Balance.TICKS_PER_SECOND);
+                .isEqualTo(Fixed.fromUnits(3) / Balance.TICKS_PER_SECOND);
         assertThat(balance.resource("stone").capFixed())
-                .isEqualTo(Fixed.fromUnits(300));
+                .isEqualTo(Fixed.fromUnits(600));
     }
 
     @Test

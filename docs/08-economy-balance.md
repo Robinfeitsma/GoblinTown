@@ -1,6 +1,6 @@
 ---
 title: Economy Balance (Phase 1)
-status: draft
+status: approved
 updated: 2026-11-22
 placeholders: true
 ---
@@ -82,9 +82,7 @@ Q32.32 at load):
 | 20 | 10 450 | ~87 min |
 | 30 | 23 200 | ~3.2 h |
 
-Satisfies P2 (2–3 level-ups per burst ≈ levels 5–10 by 20 min) and gives
-overnight runs (P3) 8+ level-ups per goblin **if** OQ-2 resolves to
-"XP continues at cap".
+Satisfies P2 (2–3 level-ups per burst ≈ levels 5–10 by 20 min) and gives overnight runs (P3) 8+ level-ups per goblin (resolved OQ-2: XP continues at cap).
 
 ### Rolled back from the placeholders
 
@@ -105,28 +103,37 @@ positive capacity, MAX_LEVEL ≤ 1 000 000).
 
 - Offline: linear rates ⇒ closed-form catch-up exact (DR-0003); caps clamp
   silently and emit `StockpileFull` once (sim behavior, unchanged here).
-- Zero assignments: Phase 1 has no government/our production (idle with zero
-  assignments produces nothing — buildings doc must state passive rates).
-- Food/wood/stone overflow: clamp + event (chosen; alt-overtone semantics in
-  OQ-1 must be resolved *before* buildings make overflow a real choice).
+- Zero assignments: Phase 1 has no government/passive production — idle with
+  zero assignments produces nothing; the buildings phase must add the
+  passive-rate table the idle-loop doc reserves.
+- Stockpile overflow: clamp + `StockpileFull` event (resolved OQ-1 above;
+  chosen before buildings make overflow a real choice).
 - Max level: engine guard 1 000 000; no soft cap designed yet (OQ-3).
 
-## Open questions (user decisions)
+## Open questions
 
-- OQ-1 — Storage overflow semantics: **clamp + event** (this doc's choice;
-  zero jag), OR waste/bank the overflow for later. Affects fun when buildings
-  arrive; cheap to change while Phase 1 is the only consumer.
-- OQ-2 — XP while stockpile is full: **continue accruing** (rewards real id
-  time, supports P3) vs pause (production-honest but makes caps painful).
-  Phase-1 sim currently continues XP independent of caps — matches this
-  doc's recommendation as drafted.
 - OQ-3 — Deep-level soft cap or mastery return at high levels: deferred vs
   level 50+ (needs role power mechanics that don't exist yet).
 - OQ-4 — Hero aura: range, strength, powerup scaling deferral (balance doc
   later — the idle-loop doc already scopes it as a bonus).
 
+### Resolved by user review (2026-11-22)
+
+- OQ-1 — **Clamp + event.** Stockpile overflow is clamped; the timeline
+  emits `StockpileFull`. Zero pain in Phase 1; revisit when buildings make
+  storage a real choice.
+- OQ-2 — **XP continues while the stockpile is full.** Idling at cap still
+  levels goblins (pillar 1). The Phase-1 sim already behaves this way —
+  binding by user decision, not implementation accident.
+- Draft numbers **approved** (caps 800/900/600, rates gatherer 3 wood/s /
+  miner 2 stone/s, XP curve base 100 / growth 50). `data/economy.json` wired
+  to these values; the JSON remains the runtime source of truth (H5).
+
 ## Changelog
 
+- 2026-11-22 — **Approved by user review**: OQ-1 clamp+event, OQ-2 XP
+  continues at cap, draft numbers accepted. Status draft → approved;
+  `data/economy.json` wired.
 - 2026-11-22 — Initial draft: pacing targets P1–P4 derived from approved
   docs, scale chain, Phase-1 draft numbers (caps 800/900/600, rates 3/2,
   XP curve retained), open questions OQ-1–OQ-4.

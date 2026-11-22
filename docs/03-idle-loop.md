@@ -44,7 +44,9 @@ Tick (base unit)
 
 - All rates integer/fixed-point per H1; no floating point in sim math.
 - Rates live in data tables (H5): `role`, `building`, `tier` tables with
-  production/consumption per tick. All numbers `PLACEHOLDER` until balance doc.
+  production/consumption per tick. Phase-1 numbers are approved in
+  [Economy Balance](08-economy-balance.md) and live in
+  `data/economy.json`; building/tier tables remain `PLACEHOLDER`.
 - Offline catch-up: production for elapsed time is computed in closed form
   per building (rate × ticks, respecting caps and unlocks), NOT simulated
   tick-by-tick (H2). Where interactions make closed form impossible, chunked
