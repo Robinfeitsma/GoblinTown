@@ -1,14 +1,13 @@
 ---
 title: DR-0003 — Fixed-Point Convention (sim ring)
-status: review
+status: approved
 updated: 2026-11-22
 ---
 
 # DR-0003 — Fixed-Point Convention (sim ring)
 
 - **Date:** 2026-11-22
-- **Status:** review (approval → user confirmation pending; needed before the
-  first balance numbers land, per `rules/02-coding.md` §Java rules)
+- **Status:** approved (user confirmed 2026-11-22)
 - **Supersedes:** none
 
 ## Context
@@ -93,5 +92,6 @@ migration (v→v+1), never a logic edit.
 
 ## Changelog
 
+- 2026-11-22 — **Approved** by the user (explicit confirmation).
 - 2026-11-22 — Initial draft, submitted for review together with the Phase-1
   tick-economy skeleton it unblocks.

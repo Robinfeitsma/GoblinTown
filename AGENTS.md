@@ -69,8 +69,9 @@ engine dependencies to `sim` (rules/02 §10).
   tick-by-tick (exact), including event-timeline byte-identity (H1/H2).
 - A self-enforcing no-float gate (`NoFloatingPointInSimTest`) guards the
   Q32.32 convention (DR-0003).
-- **Pending: DR-0003 approval** (user confirmation) — it unblocks the first
-  real balance numbers.
+- DR-0003 is **approved** (Q32.32 in `int64`) — balance numbers may now land
+  for real; a self-enforcing no-float gate
+  (`NoFloatingPointInSimTest`) guards the convention.
 - Next: balance-doc phase (replace PLACEHOLDER numbers), then the Phase-1
   render fixture (300+ sprites, `core`, DR-0001 validation task 3), then
   the plan-UI overlay.
