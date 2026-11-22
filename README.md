@@ -63,10 +63,12 @@ graph, so the simulation physically cannot reach the engine (H11, M1–M6).
 
 1. Install **JDK 17+ (LTS)** — `apt install openjdk-17-jdk` (Linux) or a
    Temurin/Adoptium MSI (Windows).
-2. Get the Gradle wrapper once: with Gradle 8.x installed run
-   `gradle wrapper --gradle-version 8.10` in the repo root — or let an IDE
-   (IntelliJ/Eclipse) import the project and generate it. The wrapper's
-   `gradlew`/`gradlew.bat` is committed from then on.
+2. The Gradle wrapper (`gradlew`/`gradlew.bat`) is **already committed** at
+   Gradle 9.9.2 — `./gradlew` downloads its own Gradle, so no local Gradle
+   install is needed. Note: Gradle 8.x cannot run on a JDK 25 runtime; 9.9.2
+   can. Gradle needs a JDK with `javac` (a full JDK, not a JRE); if multiple
+   JDKs are present, point Gradle at one with `org.gradle.java.home=…` in
+   `~/.gradle/gradle.properties` (machine-local, never committed).
 3. `./gradlew test` — runs the whole test suite (sim determinism included).
 4. `./gradlew :lwjgl3:run` — launches the (skeleton) game window.
 5. `./gradlew :headless:run` — CLI simulator (headless, no window).
