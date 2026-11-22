@@ -27,9 +27,11 @@ class TickEconomyTest {
         int ticks = 600; // 10 seconds at 60 Hz, below the wood cap
         engine.tick(ticks);
 
-        // Phase-1 production is linear: stockpile = per-tick gain × ticks,
-        // exactly (fixed-point addition never truncates; DR-0003).
-        long expected = gatherer.amountPerTickFixed() * ticks;
+        // Phase-1 production is linear: stockpile = founding supply +
+        // per-tick gain × ticks, exactly (fixed-point addition never
+        // truncates; DR-0003). The 450-wood founding supply is docs/09.
+        long expected = Fixed.fromUnits(balance.foundingSupply("wood"))
+                + gatherer.amountPerTickFixed() * ticks;
         assertThat(engine.snapshot().stockpile().get("wood")).isEqualTo(expected);
         assertThat(engine.snapshot().tick()).isEqualTo(ticks);
     }
@@ -39,6 +41,7 @@ class TickEconomyTest {
         Balance balance = TestSupport.balance();
         Balance.ResourceDef wood = balance.resource("wood");
         long cap = wood.capFixed();
+        long initial = Fixed.fromUnits(balance.foundingSupply("wood"));
 
         SimEngine engine = TestSupport.newGame(TestSupport.SEED);
         engine.execute(new Command.AssignWorkers("gatherer", 25)); // fast fill
@@ -56,9 +59,10 @@ class TickEconomyTest {
         assertThat(fullEvents).as("exactly one 'full' transition, not a flood").isEqualTo(1);
 
         // The event's tick must be the FIRST tick where stock ≥ cap:
-        // t = ceil(cap / gain), because stock grows by `gain` per tick.
+        // t = ceil((cap − supply) / gain), because stock grows by `gain`
+        // per tick from the founding supply.
         long gain = 25L * balance.role("gatherer").amountPerTickFixed();
-        long expectedFillTick = Fixed.ceilDiv(cap, gain);
+        long expectedFillTick = Fixed.ceilDiv(cap - initial, gain);
         long actual = end.events().stream()
                 .filter(e -> e instanceof SimEvent.StockpileFull)
                 .mapToLong(SimEvent::tick)
@@ -104,7 +108,11 @@ class TickEconomyTest {
 
         engine.tick(1_000); // no guidance doc says idle workers tick anything yet
         GameState end = engine.snapshot();
-        assertThat(end.stockpile()).allSatisfy((id, amount) -> assertThat(amount).isEqualTo(0));
+        // everything stays at its founding state (wood = founding supply)
+        assertThat(end.stockpile().get("wood"))
+                .isEqualTo(Fixed.fromUnits(TestSupport.balance().foundingSupply("wood")));
+        assertThat(end.stockpile().get("food")).isEqualTo(0);
+        assertThat(end.stockpile().get("stone")).isEqualTo(0);
         assertThat(end.events()).isEmpty();
         assertThat(end.roleLevel()).allSatisfy((id, level) -> assertThat(level).isEqualTo(1));
     }

@@ -71,7 +71,7 @@ class DeterminismSmokeTest {
         int eightHoursOfTicks = Balance.TICKS_PER_SECOND * 60 * 60 * 8;
         for (long seed : goldenSeeds()) {
             // Live play: commands at step boundaries, then long steady stretch.
-            SimEngine live = TestSupport.newGame(seed);
+            SimEngine live = TestSupport.freshTown(seed);
             long liveLastStepTick = 0;
             for (TestSupport.ScenarioStep step : TestSupport.SCENARIO) {
                 live.execute(step.command());
@@ -84,7 +84,7 @@ class DeterminismSmokeTest {
             // Offline catch-up: same start + same commands; the whole
             // steady stretch resolved in ONE closed-form catch-up
             // (~1.73M ticks — H2's 8h return).
-            SimEngine offline = TestSupport.newGame(seed);
+            SimEngine offline = TestSupport.freshTown(seed);
             long offlineAfterSteps = 0;
             for (TestSupport.ScenarioStep step : TestSupport.SCENARIO) {
                 offline.execute(step.command());
@@ -100,10 +100,12 @@ class DeterminismSmokeTest {
 
             // And the merged world must keep agreeing afterwards: resume
             // live play from BOTH snapshots with identical commands.
+            // (gatherer sits at 2 after the scenario; +2 fills the camp's
+            // four slots to capacity.)
             int tailTicks = 5_000;
-            live.execute(new dev.goblintown.sim.command.Command.AssignWorkers("gatherer", 7));
+            live.execute(new dev.goblintown.sim.command.Command.AssignWorkers("gatherer", 2));
             live.tick(tailTicks);
-            offline.execute(new dev.goblintown.sim.command.Command.AssignWorkers("gatherer", 7));
+            offline.execute(new dev.goblintown.sim.command.Command.AssignWorkers("gatherer", 2));
             offline.tick(tailTicks);
             assertThat(SaveCodec.stateHash(offline.snapshot()))
                     .as("post-catch-up resume must equal live play (seed %d)", seed)
@@ -115,7 +117,7 @@ class DeterminismSmokeTest {
     }
 
     private String runScenarioAndHash(long seed) {
-        SimEngine engine = TestSupport.newGame(seed);
+        SimEngine engine = TestSupport.freshTown(seed);
         for (TestSupport.ScenarioStep step : TestSupport.SCENARIO) {
             engine.execute(step.command());
             engine.tick(step.ticks());

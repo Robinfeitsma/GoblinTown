@@ -15,7 +15,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(Command.AssignWorkers.class),
-        @JsonSubTypes.Type(Command.UnassignWorkers.class)
+        @JsonSubTypes.Type(Command.UnassignWorkers.class),
+        @JsonSubTypes.Type(Command.Build.class),
+        @JsonSubTypes.Type(Command.CancelSite.class),
+        @JsonSubTypes.Type(Command.AssignBuilders.class),
+        @JsonSubTypes.Type(Command.UnassignBuilders.class)
 })
 public sealed interface Command {
 
@@ -37,6 +41,53 @@ public sealed interface Command {
         public UnassignWorkers {
             if (roleId == null || roleId.isBlank()) {
                 throw new IllegalArgumentException("roleId required");
+            }
+            if (count <= 0) {
+                throw new IllegalArgumentException("count must be positive: " + count);
+            }
+        }
+    }
+
+    /** Starts a construction site of {@code buildingType} — validates
+     *  buildability and affordability, deducts the full cost upfront
+     *  (docs/09: sites never starve, offline math stays closed-form). */
+    record Build(String buildingType) implements Command {
+        public Build {
+            if (buildingType == null || buildingType.isBlank()) {
+                throw new IllegalArgumentException("buildingType required");
+            }
+        }
+    }
+
+    /** Cancels an in-progress site; the deducted cost is refunded in full
+     *  (docs/09 OQ-2). Completing this site is an error. */
+    record CancelSite(String buildingId) implements Command {
+        public CancelSite {
+            if (buildingId == null || buildingId.isBlank()) {
+                throw new IllegalArgumentException("buildingId required");
+            }
+        }
+    }
+
+    /** Allocates {@code count} goblins to build on site {@code buildingId}
+     *  (builder = labor mode, docs/09 §Worker accounting). */
+    record AssignBuilders(String buildingId, int count) implements Command {
+        public AssignBuilders {
+            if (buildingId == null || buildingId.isBlank()) {
+                throw new IllegalArgumentException("buildingId required");
+            }
+            if (count <= 0) {
+                throw new IllegalArgumentException("count must be positive: " + count);
+            }
+        }
+    }
+
+    /** Pulls {@code count} goblins off site {@code buildingId} (clamped at
+     *  0 — over-allocation is a caller bug, not a sim error). */
+    record UnassignBuilders(String buildingId, int count) implements Command {
+        public UnassignBuilders {
+            if (buildingId == null || buildingId.isBlank()) {
+                throw new IllegalArgumentException("buildingId required");
             }
             if (count <= 0) {
                 throw new IllegalArgumentException("count must be positive: " + count);

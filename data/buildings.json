@@ -1,0 +1,42 @@
+{
+  "$comment": "Building table per docs/09-buildings-construction.md (approved 2026-11-22). Abstract-slot buildings (Phase 2a): no map position. cost whole units, deducted upfront at build confirmation; progressCost in progress-points, builders add 1/tick (60 t/s). 'hosts' + 'slots': which role may have workers here once complete. 'requires': an id of a building TYPE whose instance must be complete before this type is buildable (only meaningful when startUnlocked=false). 'grantsTier': town tier granted on first completion (highest completed wins; tier content lands with the tiers phase). 'capacityBonus': resource -> whole units added to the base cap in economy.json.",
+  "buildings": [
+    {
+      "id": "wood-camp",
+      "hosts": "gatherer",
+      "slots": 4,
+      "cost": [{ "resource": "wood", "amount": 450 }],
+      "progressCost": 4500,
+      "startUnlocked": true,
+      "grantsTier": 0
+    },
+    {
+      "id": "stone-quarry",
+      "hosts": "miner",
+      "slots": 4,
+      "cost": [{ "resource": "wood", "amount": 450 }],
+      "progressCost": 4500,
+      "startUnlocked": false,
+      "requires": "wood-camp",
+      "grantsTier": 0
+    },
+    {
+      "id": "food-larder",
+      "cost": [{ "resource": "wood", "amount": 300 }],
+      "progressCost": 3000,
+      "startUnlocked": true,
+      "capacityBonus": { "food": 400 },
+      "grantsTier": 0
+    },
+    {
+      "id": "goblin-hall",
+      "cost": [
+        { "resource": "wood", "amount": 450 },
+        { "resource": "stone", "amount": 300 }
+      ],
+      "progressCost": 5400,
+      "startUnlocked": true,
+      "grantsTier": 1
+    }
+  ]
+}

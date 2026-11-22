@@ -15,13 +15,26 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
+        @JsonSubTypes.Type(SimEvent.BuildingFinished.class),
+        @JsonSubTypes.Type(SimEvent.RoleLevelUp.class),
         @JsonSubTypes.Type(SimEvent.StockpileFull.class),
-        @JsonSubTypes.Type(SimEvent.RoleLevelUp.class)
+        @JsonSubTypes.Type(SimEvent.SiteCancelled.class)
 })
 public sealed interface SimEvent {
 
     /** Ticks executed by the engine up to (and including) this event. */
     long tick();
+
+    /** A construction site reached its progressCost at {@code tick} and is
+     *  now complete — slots/capacity bonuses apply from the NEXT production
+     *  step in the same tick (construction runs before roles, docs/09). */
+    record BuildingFinished(long tick, String buildingId, String buildingType) implements SimEvent {
+    }
+
+    /** A role's worker pool completed level {@code newLevel - 1} and is now
+     *  at {@code newLevel}. Emitted once per completed level. */
+    record RoleLevelUp(long tick, String roleId, int newLevel) implements SimEvent {
+    }
 
     /** A resource first reached (or overflowed into) its storage cap at
      *  {@code tick}. Emitted once per fill transition; the report shows
@@ -29,8 +42,9 @@ public sealed interface SimEvent {
     record StockpileFull(long tick, String resourceId) implements SimEvent {
     }
 
-    /** A role's worker pool completed level {@code newLevel - 1} and is now
-     *  at {@code newLevel}. Emitted once per completed level. */
-    record RoleLevelUp(long tick, String roleId, int newLevel) implements SimEvent {
+    /** An in-progress site was cancelled by command at {@code tick}; its
+     *  full deducted cost was refunded (docs/09 OQ-2). Command-time event —
+     *  not emitted by tickOnce. */
+    record SiteCancelled(long tick, String buildingId) implements SimEvent {
     }
 }

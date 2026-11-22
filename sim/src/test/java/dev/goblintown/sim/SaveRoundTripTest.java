@@ -69,13 +69,73 @@ class SaveRoundTripTest {
         SaveCodec.SaveEnvelope envelope = SaveCodec.fromCanonicalJson(
                 SaveCodec.toCanonicalJson(engine.snapshot()));
         assertThat(envelope.version()).isEqualTo(SaveCodec.SAVE_VERSION);
-        assertThat(SaveCodec.SAVE_VERSION).isEqualTo(1); // v1 = Phase-1 economy
+        assertThat(SaveCodec.SAVE_VERSION).isEqualTo(2); // v2 = town layer (docs/09)
+    }
+
+    @Test
+    void v1SavesMigrateToTheTownLayer() {
+        // A real v1 (Phase-1) save: no buildings, no builderAssignments, no
+        // nextBuildingSerial — the migration must add an EMPTY town layer
+        // (docs/09: v1 states are states with no buildings), and the loaded
+        // world must then behave exactly like it always did (H4: migrations
+        // are explicit, never destructive).
+        SimEngine reference = TestSupport.newGame(TestSupport.SEED);
+        reference.execute(new Command.AssignWorkers("gatherer", 2));
+        reference.tick(600);
+
+        String v1Json = v1JsonOf(reference.snapshot());
+        SaveCodec.SaveEnvelope migrated = SaveCodec.fromCanonicalJson(v1Json);
+        assertThat(migrated.version()).isEqualTo(1);
+        assertThat(migrated.state().buildings()).isEmpty();
+        assertThat(migrated.state().builderAssignments()).isEmpty();
+        assertThat(migrated.state().nextBuildingSerial()).isEqualTo(1L);
+
+        // the migrated world is the SAME world: stock, xp, events intact
+        assertThat(migrated.state().stockpile())
+                .usingRecursiveComparison().isEqualTo(reference.snapshot().stockpile());
+        assertThat(migrated.state().roleXp())
+                .usingRecursiveComparison().isEqualTo(reference.snapshot().roleXp());
+        assertThat(migrated.state().events())
+                .usingRecursiveFieldByFieldElementComparator()
+                .containsExactlyElementsOf(reference.snapshot().events());
+
+        // re-saving migrates it to the current version
+        assertThat(SaveCodec.toCanonicalJson(migrated.state()))
+                .contains("\"version\":" + SaveCodec.SAVE_VERSION);
+
+        // and the migrated state keeps playing forward deterministically:
+        // catch-up from the migrated save == the v1 world having continued
+        SimEngine continued = new SimEngine(TestSupport.balance(), migrated.state());
+        reference.tick(5_000);
+        continued.catchUp(5_000);
+        assertThat(migrated.state().tick()).isEqualTo(600L); // snapshot untouched
+        assertThat(Fixed.unitsFloor(continued.snapshot().stockpile().get("wood")))
+                .isEqualTo(Fixed.unitsFloor(reference.snapshot().stockpile().get("wood")));
+    }
+
+    /** Serializes a v2 snapshot, then strips the town-layer fields — the
+     *  exact inverse of the v2 code change (state shape minus town layer). */
+    private static String v1JsonOf(GameState state) {
+        // NOTE: the canonical mapper sorts keys alphabetically, so the record
+        // field order in the JSON is state-first, version-last.
+        String v2 = SaveCodec.toCanonicalJson(state)
+                .replace("\"version\":" + SaveCodec.SAVE_VERSION, "\"version\":1");
+        // drop the added record components (alphabetical field order: they
+        // are builderAssignments, buildings, nextBuildingSerial)
+        v2 = v2.replaceAll(",\"builderAssignments\":\\{\\}", "")
+                .replaceAll(",\"buildings\":\\[\\]", "")
+                .replaceAll(",\"nextBuildingSerial\":\\d+", "");
+        if (v2.contains("buildings") || v2.contains("nextBuildingSerial")
+                || v2.contains("builderAssignments")) {
+            throw new IllegalStateException("fixture was not v1-shaped: " + v2);
+        }
+        return v2;
     }
 
     @Test
     void unknownFieldsAreRejectedNotIgnored() {
-        // A save written by a NEWER build (unknown fields) must fail at load,
-        // not silently drop data (H4: migrations are explicit).
+        // A save written by a NEWER build (unknown fields on a known version)
+        // must fail at load, not silently drop data (H4: migrations explicit).
         String future = """
                 {"version":1,"state":{"tick":5,"stockpile":{},"assignments":{},
                  "roleXp":{},"roleLevel":{},"rngState":0,"events":[],"brandNewThing":true}}

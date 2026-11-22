@@ -77,18 +77,32 @@ public final class Balance {
     private final List<RoleDef> roles;
     private final Map<String, ResourceDef> resourcesById;
     private final Map<String, RoleDef> rolesById;
+    private final Map<String, Long> foundingSupplies;
 
-    private Balance(List<ResourceDef> resources, List<RoleDef> roles) {
+    private Balance(List<ResourceDef> resources, List<RoleDef> roles,
+                    Map<String, Long> foundingSupplies) {
         this.resources = List.copyOf(resources);
         this.roles = List.copyOf(roles);
         this.resourcesById = index(this.resources, ResourceDef::id, "resource");
         this.rolesById = index(this.roles, RoleDef::id, "role");
+        this.foundingSupplies = validateSupplies(foundingSupplies, this.resourcesById);
         for (RoleDef role : this.roles) {
             if (role.produces() != null && !resourcesById.containsKey(role.produces())) {
                 throw new IllegalArgumentException("role " + role.id()
                         + " produces unknown resource: " + role.produces());
             }
         }
+    }
+
+    /**
+     * The stockpile a fresh founding starts with, in whole units (docs/09:
+     * the Phase-2a stand-in for founding map-node loot; the real founding
+     * economy comes with world-gen). Clamped at the resource's cap — a
+     * founding supply above capacity would create an instant StockpileFull.
+     */
+    public long foundingSupply(String resourceId) {
+        long units = foundingSupplies.getOrDefault(resourceId, 0L);
+        return Math.min(units, resource(resourceId).capacity());
     }
 
     public List<ResourceDef> resources() {
@@ -113,6 +127,16 @@ public final class Balance {
             throw new IllegalArgumentException("unknown role: " + id);
         }
         return def;
+    }
+
+    /** For cross-table validation (e.g. the buildings loader). */
+    public boolean hasResource(String id) {
+        return resourcesById.containsKey(id);
+    }
+
+    /** For cross-table validation (e.g. the buildings loader). */
+    public boolean hasRole(String id) {
+        return rolesById.containsKey(id);
     }
 
     /** Parses + validates a balance table from JSON. Throws
@@ -149,7 +173,21 @@ public final class Balance {
                 throw new IllegalArgumentException("role " + role.id() + ": rates/thresholds out of range");
             }
         }
-        return new Balance(raw.resources, raw.roles);
+        return new Balance(raw.resources, raw.roles, raw.foundingSupplies == null
+                ? Map.of() : raw.foundingSupplies);
+    }
+
+    private static Map<String, Long> validateSupplies(Map<String, Long> supplies,
+                                                      Map<String, ResourceDef> resourcesById) {
+        for (Map.Entry<String, Long> entry : supplies.entrySet()) {
+            if (!resourcesById.containsKey(entry.getKey())) {
+                throw new IllegalArgumentException("founding supply for unknown resource: " + entry.getKey());
+            }
+            if (entry.getValue() < 0) {
+                throw new IllegalArgumentException("negative founding supply: " + entry.getKey());
+            }
+        }
+        return Map.copyOf(supplies);
     }
 
     private static void requireId(String id, String kind) {
@@ -176,5 +214,6 @@ public final class Balance {
     public static final class Raw {
         public List<ResourceDef> resources;
         public List<RoleDef> roles;
+        public Map<String, Long> foundingSupplies;
     }
 }

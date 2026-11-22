@@ -31,8 +31,11 @@ public final class SaveCodec {
     /**
      * Bump on any state-shape change; migrations live in sim (rules/02:
      * the data model owns its save version). v1: Phase-1 tick economy.
+     * v2 (2026-11-22): adds the town layer — {@code buildings},
+     * {@code builderAssignments}, {@code nextBuildingSerial} (docs/09);
+     * v1 states migrate by adding an empty town (there were none).
      */
-    public static final int SAVE_VERSION = 1;
+    public static final int SAVE_VERSION = 2;
 
     private static final ObjectMapper MAPPER = JsonMapper.builder()
             // canonical output: sorted map entries, stable record field order,
@@ -64,20 +67,53 @@ public final class SaveCodec {
     /** Parses a save produced by {@link #toCanonicalJson} (or any writer of
      *  the same schema); rejects unknown fields so corrupted saves fail loudly
      *  at load, not silently deep in gameplay. Rejects saves NEWER than this
-     *  build's SAVE_VERSION (older versions get migrated, never silently
-     *  accepted). */
+     *  build's SAVE_VERSION; older versions get migrated (see
+     *  {@code migration}), never silently accepted. The returned envelope
+     *  keeps its ON-DISK version; re-saving migrates it. */
     public static SaveEnvelope fromCanonicalJson(String json) {
         try {
-            SaveEnvelope envelope = MAPPER.readValue(json, SaveEnvelope.class);
-            if (envelope.version() > SAVE_VERSION) {
-                throw new IllegalArgumentException("save version " + envelope.version()
+            com.fasterxml.jackson.databind.JsonNode root = MAPPER.readTree(json);
+            int version = root.path("version").asInt(-1);
+            if (version < 0) {
+                throw new IllegalArgumentException("save has no usable version");
+            }
+            if (version > SAVE_VERSION) {
+                throw new IllegalArgumentException("save version " + version
                         + " is newer than this build supports (" + SAVE_VERSION + ")");
             }
-            return envelope;
+            com.fasterxml.jackson.databind.JsonNode stateNode = root.get("state");
+            if (stateNode == null) {
+                throw new IllegalArgumentException("save has no state");
+            }
+            GameState state = version < SAVE_VERSION ? migrate(stateNode, version)
+                    : MAPPER.treeToValue(stateNode, GameState.class);
+            return new SaveEnvelope(version, state);
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
             throw new IllegalArgumentException("save parse failed", e);
+        }
+    }
+
+    /**
+     * The one place save migrations live (rules/02). v1 → current: the town
+     * layer fields didn't exist yet; a v1 state IS a state with no buildings
+     * (docs/09), so it loads with an empty town and serial 1.
+     */
+    private static GameState migrate(com.fasterxml.jackson.databind.JsonNode stateNode,
+                                     int version) {
+        if (version != 1) {
+            throw new IllegalArgumentException("no migration for save version " + version);
+        }
+        com.fasterxml.jackson.databind.node.ObjectNode upgraded =
+                stateNode.deepCopy();
+        upgraded.set("buildings", MAPPER.createArrayNode());
+        upgraded.set("builderAssignments", MAPPER.createObjectNode());
+        upgraded.put("nextBuildingSerial", 1L);
+        try {
+            return MAPPER.treeToValue(upgraded, GameState.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("v1 save migration failed", e);
         }
     }
 

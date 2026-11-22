@@ -1,5 +1,6 @@
 {
-  "$comment": "Phase-1 economy table. Values approved per docs/08-economy-balance.md (2026-11-22): pacing targets P1-P4, overflow = clamp + StockpileFull event, XP continues while stockpile is full. Rates are whole units per second (independent of tick rate); the sim converts to per-tick Q32.32 fixed-point once at load (DR-0003, TICKS_PER_SECOND=60). 'capacity' is in whole units. A role with no 'produces' consumes nothing and produces nothing in Phase 1.",
+  "$comment": "Phase-1/2a economy table. Values approved per docs/08-economy-balance.md (2026-11-22): pacing targets P1-P4, overflow = clamp + StockpileFull event, XP continues while stockpile is full. Rates are whole units per second (independent of tick rate); the sim converts to per-tick Q32.32 fixed-point once at load (DR-0003, TICKS_PER_SECOND=60). 'capacity' is in whole units. 'foundingSupplies' (docs/09): the Phase-2a stand-in for founding map-node loot - exactly one wood camp's cost; the real founding economy comes with world-gen. A role with no 'produces' consumes nothing and produces nothing in Phase 1.",
+  "foundingSupplies": { "food": 0, "wood": 450, "stone": 0 },
   "resources": [
     { "id": "food",  "capacity": 800 },
     { "id": "wood",  "capacity": 900 },

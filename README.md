@@ -80,10 +80,14 @@ graph, so the simulation physically cannot reach the engine (H11, M1–M6).
    (BootSmokeTest: boots + renders 100 headless frames through a GL shim; it
    measures nothing about speed — visual correctness and the 60fps budget
    need this on-GPU run on your hardware).
-6. `./gradlew :headless:run --args="--seed 20260211 --assign gatherer=4 --ticks 60000 --catch-up 1668000 --timeline"` —
+6. `./gradlew :headless:run --args="--seed 20260211 --build wood-camp --build-assign wood-camp-000001=8 --ticks 563 --assign gatherer=4 --ticks 60000 --catch-up 1668000 --timeline"` —
    headless reproduction tool: any state is reproducible from seed +
-   command list (H1/H2, rules/03 §10). Options: `--balance <file>`,
-   `--seed <n>`, `--load <save.gz>`, `--assign <role=count>` (repeatable),
+   command list (H1/H2, rules/03 §10). Options run in ARGUMENT ORDER
+   (commands interleave with time advances exactly as written):
+   `--balance <file>`, `--buildings <file>`, `--seed <n>`,
+   `--load <save.gz>`, `--build <type>`, `--build-assign <id=count>`,
+   `--build-unassign <id=count>`, `--cancel <buildingId>`,
+   `--assign <role=count>` (repeatable), `--unassign <role=count>`,
    `--ticks <n>`, `--catch-up <n>`, `--save <file>`, `--timeline`.
 
 ## Repo housekeeping
