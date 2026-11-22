@@ -70,6 +70,8 @@ project(':headless') {
     application {
         mainClass = 'dev.goblintown.gfx.HeadlessLauncher'
     }
+    // same data-classpath trick as :sim — CLI tests exercise the real tables
+    sourceSets.test.resources.srcDirs '../data'
     dependencies {
         implementation project(':sim')
         implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"

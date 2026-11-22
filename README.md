@@ -72,7 +72,13 @@ graph, so the simulation physically cannot reach the engine (H11, M1–M6).
    `~/.gradle/gradle.properties` (machine-local, never committed).
 3. `./gradlew test` — runs the whole test suite (sim determinism included).
 4. `./gradlew :lwjgl3:run` — launches the (skeleton) game window.
-5. `./gradlew :headless:run` — CLI simulator (headless, no window).
+5. `./gradlew :lwjgl3:run --args="--fixture horde"` — horde render fixture:
+   300+ animated sprites, prints frame-budget stats (DR-0001 validation 3).
+6. `./gradlew :headless:run --args="--seed 20260211 --assign gatherer=4 --ticks 60000 --catch-up 1668000 --timeline"` —
+   headless reproduction tool: any state is reproducible from seed +
+   command list (H1/H2, rules/03 §10). Options: `--balance <file>`,
+   `--seed <n>`, `--load <save.gz>`, `--assign <role=count>` (repeatable),
+   `--ticks <n>`, `--catch-up <n>`, `--save <file>`, `--timeline`.
 
 ## Repo housekeeping
 

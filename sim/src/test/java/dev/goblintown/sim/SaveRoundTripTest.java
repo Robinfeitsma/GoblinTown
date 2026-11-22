@@ -108,4 +108,40 @@ class SaveRoundTripTest {
                 .usingRecursiveFieldByFieldElementComparator()
                 .containsExactlyElementsOf(engine.snapshot().events());
     }
+
+    @Test
+    void gzipSaveFormatRoundTripsLosslessly() {
+        // H4: saves are written gzipped. The gzip bytes ARE the disk format —
+        // must decompress to the exact canonical JSON (rules/03 cat. 3).
+        SimEngine engine = TestSupport.newGame(TestSupport.SEED);
+        engine.execute(new Command.AssignWorkers("miner", 2));
+        engine.tick(7_777);
+
+        byte[] gzipped = SaveCodec.toGzipBytes(engine.snapshot());
+        byte[] raw = SaveCodec.toCanonicalJson(engine.snapshot())
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(gzipped.length)
+                .as("gzip must actually compress the canonical JSON")
+                .isLessThan(raw.length);
+
+        GameState reloaded = SaveCodec.fromGzipBytes(gzipped).state();
+        assertThat(SaveCodec.stateHash(reloaded))
+                .isEqualTo(SaveCodec.stateHash(engine.snapshot()));
+    }
+
+    @Test
+    void gzipRoundTripIsDeterministic() {
+        byte[] a = SaveCodec.toGzipBytes(advancedEngine().snapshot());
+        byte[] b = SaveCodec.toGzipBytes(advancedEngine().snapshot());
+        // Two independent runs → identical save bytes (H1: reproducible
+        // anywhere; the gzip layer adds no randomness).
+        assertThat(b).isEqualTo(a);
+    }
+
+    private static SimEngine advancedEngine() {
+        SimEngine engine = TestSupport.newGame(TestSupport.SEED);
+        engine.execute(new Command.AssignWorkers("miner", 2));
+        engine.tick(500);
+        return engine;
+    }
 }

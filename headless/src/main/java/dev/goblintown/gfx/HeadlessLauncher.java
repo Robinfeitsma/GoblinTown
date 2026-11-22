@@ -5,13 +5,16 @@ package dev.goblintown.gfx;
  * catch-up calculations, save round-trips and report dumps from the
  * command line. No rendering. Lives OUTSIDE core on purpose — it talks
  * to :sim directly (DR-0001 consequences).
+ *
+ * <pre>
+ * ./gradlew :headless:run --args="--seed 20260211 --assign gatherer=4 --ticks 6000 --timeline"
+ * ./gradlew :headless:run --args="--seed 20260211 --assign gatherer=4 --catch-up 1728000"
+ * ./gradlew :headless:run --args="--load save.gz --ticks 100 --save out.gz"
+ * </pre>
  */
 public class HeadlessLauncher {
 
     public static void main(String[] args) {
-        // TODO: argument parsing — first headless task:
-        //   --ticks N --seed S         run sim N ticks from seed, print final state hash
-        //   --catch-up 8h --seed S     offline catch-up equivalence run (rules/03 cat. 2)
-        System.out.println("GoblinTown headless simulator — not yet implemented");
+        System.exit(new HeadlessRunner().run(args, System.out));
     }
 }

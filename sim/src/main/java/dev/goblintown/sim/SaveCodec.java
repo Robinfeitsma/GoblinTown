@@ -94,4 +94,37 @@ public final class SaveCodec {
             throw new IllegalStateException("JVM without SHA-256", e);
         }
     }
+
+    // ------------------------------------------------------------------
+    // gzip layer (H4: saves are written gzipped). Pure byte transforms —
+    // actual file I/O belongs to the launcher (headless/desktop), never
+    // here within the sim's deterministic core (rules/02 §Java).
+    // ------------------------------------------------------------------
+
+    /** Canonical JSON → gzip bytes (the exact on-disk save format). */
+    public static byte[] toGzipBytes(GameState state) {
+        try {
+            var bytes = toCanonicalJson(state).getBytes(StandardCharsets.UTF_8);
+            var out = new java.io.ByteArrayOutputStream();
+            try (var gzip = new java.util.zip.GZIPOutputStream(out)) {
+                gzip.write(bytes);
+            }
+            return out.toByteArray();
+        } catch (Exception e) {
+            throw new IllegalStateException("save gzip failed", e);
+        }
+    }
+
+    /** gzip bytes → parsed, version-checked envelope (inverse of
+     *  {@link #toGzipBytes}). */
+    public static SaveEnvelope fromGzipBytes(byte[] gzipped) {
+        try (var gzIn = new java.util.zip.GZIPInputStream(new java.io.ByteArrayInputStream(gzipped))) {
+            String json = new String(gzIn.readAllBytes(), StandardCharsets.UTF_8);
+            return fromCanonicalJson(json);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("save gunzip failed", e);
+        }
+    }
 }

@@ -51,9 +51,13 @@ public final class SimEngine {
     private final Balance balance;
 
     /**
-     * The canonical event order of {@code tickOnce}: by tick, then role
-     * balance order, then level-ups before production events within a role.
-     * Built per engine because the tie-break needs this balance's role order.
+     * The canonical event order of {@code tickOnce}: by tick, then the
+     * emitting role's position in the balance role list (a resource's
+     * StockpileFull is emitted by the role that produces it — the resource id
+     * maps through {@code resourceProducer}), then level-ups before
+     * production events within one role. Built per engine; this must remain
+     * EXACTLY the order the tickOnce role loop emits, or catch-up stars
+     * diverging from live play (H1).
      */
     private final Comparator<SimEvent> eventOrder;
 
@@ -74,14 +78,19 @@ public final class SimEngine {
 
     public SimEngine(Balance balance, GameState state) {
         this.balance = balance;
-        Map<String, Integer> roleOrder = new HashMap<>();
+        // role position for RoleLevelUp; resourceId → producing role's
+        // position for StockpileFull (both = position in the tickOnce loop)
+        Map<String, Integer> eventRoleOrder = new HashMap<>();
         List<Balance.RoleDef> defs = balance.roles();
         for (int i = 0; i < defs.size(); i++) {
-            roleOrder.put(defs.get(i).id(), i);
+            eventRoleOrder.put(defs.get(i).id(), i);
+            if (defs.get(i).produces() != null) {
+                eventRoleOrder.putIfAbsent(defs.get(i).produces(), i);
+            }
         }
         this.eventOrder = Comparator
                 .comparingLong(SimEvent::tick)
-                .thenComparingInt(e -> roleOrderOf(roleOrder, e))
+                .thenComparingInt(e -> roleOrderOf(eventRoleOrder, e))
                 .thenComparingInt(SimEngine::kindRank);
         this.tick = state.tick();
         this.stockpile = new LinkedHashMap<>(state.stockpile());
@@ -280,13 +289,16 @@ public final class SimEngine {
                 (id, current) -> Math.max(0, current - count));
     }
 
-    private static int roleOrderOf(Map<String, Integer> roleOrder, SimEvent event) {
-        String roleId = null;
+    private static int roleOrderOf(Map<String, Integer> eventRoleOrder, SimEvent event) {
+        String key;
         if (event instanceof SimEvent.RoleLevelUp levelUp) {
-            roleId = levelUp.roleId();
-        } // StockpileFull events carry a resourceId, not a role; they tie-break
-          // by kindRank below, so they never need the role order.
-        Integer index = roleId == null ? null : roleOrder.get(roleId);
+            key = levelUp.roleId();
+        } else if (event instanceof SimEvent.StockpileFull stockpileFull) {
+            key = stockpileFull.resourceId(); // maps to its producing role
+        } else {
+            key = null;
+        }
+        Integer index = key == null ? null : eventRoleOrder.get(key);
         return index == null ? Integer.MAX_VALUE : index;
     }
 
