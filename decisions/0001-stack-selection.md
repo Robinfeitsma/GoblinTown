@@ -48,6 +48,12 @@ the original recommendation converts from *gate* to *first validation tasks*
    category 2 tests.
 3. Horde rendering fixture: 300+ animated isometric sprites via SpriteBatch
    at 60fps (`PLACEHOLDER` acceptance test lands in the render module).
+   **Result 2026-11-22: PASS.** `core/HordeRenderFixture` (320 sprites, one
+   SpriteBatch) on dev hardware locks at 60fps vsync — avg 16.67ms,
+   worst 16.7–25.2ms across 30× 1s windows (worst frames during warmup).
+   Boot also smoke-tested headless (`core` BootSmokeTest, 100+ frames via a
+   GL shim, speed not measured). Timeline: `--assign gatherer=4 --ticks
+   1668000 --catch-up 3600 --timeline` covers task 1–2 in CI.
 4. Plan-overlay drawing + hit testing — part of the first plan UI task.
 
 ## Rationale
