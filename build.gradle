@@ -2,6 +2,10 @@
  * GoblinTown — root build.
  * Module rules live in docs/rules/02-coding.md (§10-Language-specific).
  * Dependency direction is compiler-enforced: `sim` has NO gdx dependency.
+ *
+ * Note: the java-library plugin is applied from this file for every module —
+ * the `java { }` extension cannot be called inside subprojects{}, so target
+ * compatibility is set via `options.release` on the compile tasks instead.
  */
 ext {
     gdxVersion = '1.13.1'
@@ -21,14 +25,9 @@ allprojects {
 subprojects {
     apply plugin: 'java-library'
 
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(17)
-        }
-    }
-
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
+        options.release = 17
     }
 
     tasks.withType(Test).configureEach {
@@ -62,6 +61,10 @@ project(':core') {
 }
 
 project(':headless') {
+    apply plugin: 'application'
+    application {
+        mainClass = 'dev.goblintown.gfx.HeadlessLauncher'
+    }
     dependencies {
         implementation project(':sim')
         implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
@@ -69,6 +72,10 @@ project(':headless') {
 }
 
 project(':lwjgl3') {
+    apply plugin: 'application'
+    application {
+        mainClass = 'dev.goblintown.gfx.DesktopLauncher'
+    }
     dependencies {
         implementation project(':core')
         implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
