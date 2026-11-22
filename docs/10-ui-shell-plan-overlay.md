@@ -1,6 +1,6 @@
 ---
 title: UI Shell & Plan Overlay (first UI phase)
-status: draft
+status: approved
 updated: 2026-11-22
 placeholders: true
 supersedes:
@@ -131,19 +131,21 @@ hit-testing is tested, with synthetic tables or fixtures per project layout).
 
 ## Open questions
 
-- **OQ-1 (scope):** Build the plan-overlay fixture on a SYNTHETIC dungeon
-  graph now (my recommendation — validation 4 unblocks, no docs/04 rework),
-  or wait for the docs/04 run-system sim phase and build the overlay
-  directly against real plan data (slower, but no fixture-throwaway risk)?
-- **OQ-2 (input):** Route drawing model: **click-to-append/truncate** (what
-  this doc specifies; precise, mobile-ready) or **drag-to-draw** (feels
-  faster, ambiguous exits, freehand = plan-gate grief)?
-- **OQ-3 (HUD tooling):** Town HUD via libGDX **scene2d widgets** (fast,
-  stock look) or **custom SpriteBatch drawing** (full art control, more code)?
-  This doc assumes scene2d for HUD panels + custom drawing for the iso map.
+- **OQ-1 (scope):** RESOLVED 2026-11-22 — **synthetic fixture first** (user
+  selection). Seeded fake dungeon graph in `core`; the overlay's geometric
+  core transfers to the real plan data later as a type change.
+- **OQ-2 (input):** RESOLVED 2026-11-22 — **click-to-append** (user
+  selection). Click a zone → route extends; click an earlier routed node →
+  truncates there (docs/04 branch fallbacks); non-adjacent → rejected with
+  feedback.
+- **OQ-3 (HUD tooling):** RESOLVED 2026-11-22 — **scene2d widgets** (user
+  selection) for HUD panels; custom SpriteBatch drawing stays for the iso
+  map. Respec later if stock look blocks art direction.
 
 ## Changelog
 
 - 2026-11-22 — Initial draft: screen graph, input→command boundary, shared
   isometric transform, plan-overlay fixture spec (DR-0001 validation 4),
   OQ-1–OQ-3 opened.
+- 2026-11-22 — **Approved**: OQ-1 synthetic-first, OQ-2 click-to-append,
+  OQ-3 scene2d HUD; implementation begins.
