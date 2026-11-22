@@ -1,0 +1,77 @@
+/*
+ * GoblinTown — root build.
+ * Module rules live in docs/rules/02-coding.md (§10-Language-specific).
+ * Dependency direction is compiler-enforced: `sim` has NO gdx dependency.
+ */
+ext {
+    gdxVersion = '1.13.1'
+    junitVersion = '5.10.2'
+    assertjVersion = '3.26.0'
+    jacksonVersion = '2.17.2'
+}
+
+allprojects {
+    group = 'dev.goblintown'
+    version = '0.1.0'
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        testLogging {
+            events 'failed', 'skipped'
+        }
+    }
+
+    dependencies {
+        testImplementation platform("org.junit:junit-bom:${junitVersion}")
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testImplementation "org.assertj:assertj-core:${assertjVersion}"
+    }
+}
+
+project(':sim') {
+    dependencies {
+        implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+        // NOTE: intentionally NO libGDX dependency (architecture rule M1/M2,
+        // H7, H11). Do not add engine dependencies to :sim.
+    }
+}
+
+project(':core') {
+    dependencies {
+        api project(':sim')
+        api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    }
+}
+
+project(':headless') {
+    dependencies {
+        implementation project(':sim')
+        implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    }
+}
+
+project(':lwjgl3') {
+    dependencies {
+        implementation project(':core')
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+        runtimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+}

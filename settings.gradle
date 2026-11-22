@@ -1,0 +1,3 @@
+rootProject.name = 'goblin-town'
+
+include 'sim', 'core', 'headless', 'lwjgl3'

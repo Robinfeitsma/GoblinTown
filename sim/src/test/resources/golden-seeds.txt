@@ -1,0 +1,4 @@
+# Goldenseeds for rules/03 category-1 determinism tests.
+# One seed per line; every merged PR that touches sim behavior extends this
+# list (rules/03-testing.md §Determinism test conventions).
+# PLACEHOLDER: replace with real seeds when the first tick economy lands.
