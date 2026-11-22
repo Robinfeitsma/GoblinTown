@@ -58,8 +58,19 @@ engine dependencies to `sim` (rules/02 §10).
 
 ## Current phase
 
-**Phase 1 — Simulation core first.** Stack approved (DR-0001). The first
-working code is the `sim` module's tick economy with determinism and
-save-round-trip tests green (rules/03 §Phase-1 test priorities) — before any
-rendering. Balance numbers and strata content are still `PLACEHOLDER` until
-their balance-doc phases.
+**Phase 1 — Simulation core first (tick-economy skeleton LANDED).**
+
+- `sim` skeleton is green: two producer roles, stockpile with caps, role
+  XP/level-ups, closed-form offline catch-up (H2), save codec v1 (canonical
+  JSON, version-stamped) — `./gradlew test`, 22+ tests, 0 skipped.
+- Determinism gates from `rules/03 §Phase-1 test priorities` are OPEN:
+  two-run rule across golden seeds
+  (`sim/src/test/resources/golden-seeds.txt`) and catch-up ==
+  tick-by-tick (exact), including event-timeline byte-identity (H1/H2).
+- A self-enforcing no-float gate (`NoFloatingPointInSimTest`) guards the
+  Q32.32 convention (DR-0003).
+- **Pending: DR-0003 approval** (user confirmation) — it unblocks the first
+  real balance numbers.
+- Next: balance-doc phase (replace PLACEHOLDER numbers), then the Phase-1
+  render fixture (300+ sprites, `core`, DR-0001 validation task 3), then
+  the plan-UI overlay.

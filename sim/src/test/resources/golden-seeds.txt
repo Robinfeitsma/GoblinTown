@@ -1,4 +1,6 @@
-# Goldenseeds for rules/03 category-1 determinism tests.
-# One seed per line; every merged PR that touches sim behavior extends this
-# list (rules/03-testing.md §Determinism test conventions).
-# PLACEHOLDER: replace with real seeds when the first tick economy lands.
+# Golden seeds (rules/03 §Determinism test conventions).
+# One numeric seed per line; '#' starts a comment. Every PR extending the
+# determinism surface adds its seed here. Tests loop ALL seeds.
+20260211
+424242
+13371337

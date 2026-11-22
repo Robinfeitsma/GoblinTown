@@ -46,6 +46,11 @@ subprojects {
 }
 
 project(':sim') {
+    // H5: data tables live under data/ at repo root. They are on the sim
+    // TEST classpath so tests load the very same JSON the game ships with —
+    // no copied fixtures that could drift.
+    sourceSets.test.resources.srcDirs '../data'
+
     dependencies {
         implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
         // NOTE: intentionally NO libGDX dependency (architecture rule M1/M2,

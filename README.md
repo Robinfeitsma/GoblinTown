@@ -36,6 +36,7 @@ loaded automatically by Vibe and links every binding rule in `rules/`.
 |---|---|---|
 | [`decisions/0001-stack-selection.md`](decisions/0001-stack-selection.md) | approved | Stack = **libGDX + Java** (user selection); first validation tasks |
 | [`decisions/0002-repository-migration.md`](decisions/0002-repository-migration.md) | approved | Design workspace migrated into this repo; module layout |
+| [`decisions/0003-fixed-point-convention.md`](decisions/0003-fixed-point-convention.md) | review | Sim arithmetic = Q32.32 in `int64`; unblocks Phase-1 balance numbers |
 
 Templates: [`docs/templates/`](docs/templates/) — never write a new document
 from scratch.

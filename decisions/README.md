@@ -7,5 +7,9 @@ Decision Records (ADR-style) with consequences. Numbered `0001`, `0002`, …
   confirmation).
 - An approved decision may only be changed by a new record that supersedes it.
 
-Pending decision: **DR-0001 stack selection** — cannot start until
-`../docs/01-technical-requirements.md` reaches `Status: approved`.
+- DR-0001 — stack selection (libGDX + Java) — **approved**
+- DR-0002 — design workspace migrated into coding repo — **approved**
+- DR-0003 — fixed-point convention (Q32.32 in `int64`) — **review**
+
+Pending decision: **DR-0003 fixed-point convention** — unblocks the Phase-1
+balance numbers; approval requires the user's explicit confirmation.

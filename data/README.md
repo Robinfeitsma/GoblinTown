@@ -6,6 +6,9 @@ code change (H5) and must never appear as constants in game logic (rules/02).
 
 Planned (schemas land with their mechanics-doc phase):
 
+- `economy.json` — **lands with Phase 1**: Phase-1 composite table
+  (resources + capacities, roles + per-second rates, XP/level-up tuning).
+  Will be split into `roles.json` / `buildings.json` when buildings arrive.
 - `roles.json` — role definitions, base output/tick, level curves
 - `buildings.json` — building costs, production/consumption, tier requirements
 - `town-tiers.json` — tier thresholds, role unlocks (role knowledge)

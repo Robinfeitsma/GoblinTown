@@ -1,0 +1,26 @@
+{
+  "$comment": "Phase-1 economy table (docs/03-idle-loop.md). ALL NUMBERS ARE PLACEHOLDER until the balance-doc phase - only the structure is binding. Rates are whole units per second (independent of tick rate); the sim converts to per-tick Q32.32 fixed-point once at load (DR-0003, TICKS_PER_SECOND=60). 'cap' is in whole units. A role with no 'produces' consumes nothing and produces nothing in Phase 1.",
+  "resources": [
+    { "id": "food",  "capacity": 500 },
+    { "id": "wood",  "capacity": 500 },
+    { "id": "stone", "capacity": 300 }
+  ],
+  "roles": [
+    {
+      "id": "gatherer",
+      "produces": "wood",
+      "unitsPerSecond": 6,
+      "xpPerSecond": 2,
+      "levelUpBaseXp": 100,
+      "levelUpXpGrowth": 50
+    },
+    {
+      "id": "miner",
+      "produces": "stone",
+      "unitsPerSecond": 4,
+      "xpPerSecond": 2,
+      "levelUpBaseXp": 120,
+      "levelUpXpGrowth": 60
+    }
+  ]
+}
