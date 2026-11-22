@@ -21,6 +21,7 @@ loaded automatically by Vibe and links every binding rule in `rules/`.
 | [`docs/07-stack-comparison.md`](docs/07-stack-comparison.md) | approved (record) | 6 candidate stacks scored; the input to DR-0001 |
 | [`docs/08-economy-balance.md`](docs/08-economy-balance.md) | approved | Phase-1 pacing targets, scale chain, approved caps/rates/XP curve; OQ-1/OQ-2 resolved |
 | [`docs/09-buildings-construction.md`](docs/09-buildings-construction.md) | approved | Buildings model (abstract slots 2a), construction mechanic, founding build order, `buildings.json` schema |
+| [`docs/10-ui-shell-plan-overlay.md`](docs/10-ui-shell-plan-overlay.md) | draft | UI screen graph, input→command boundary, shared iso transform, plan-overlay fixture (DR-0001 validation 4); OQ-1–OQ-3 open |
 
 ### Rules (binding for any LLM working here)
 
