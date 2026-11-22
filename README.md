@@ -74,6 +74,10 @@ graph, so the simulation physically cannot reach the engine (H11, M1–M6).
 4. `./gradlew :lwjgl3:run` — launches the (skeleton) game window.
 5. `./gradlew :lwjgl3:run --args="--fixture horde"` — horde render fixture:
    300+ animated sprites, prints frame-budget stats (DR-0001 validation 3).
+   A headless boot smoke of the same fixture runs in `./gradlew :core:test`
+   (BootSmokeTest: boots + renders 100 headless frames through a GL shim; it
+   measures nothing about speed — visual correctness and the 60fps budget
+   need this on-GPU run on your hardware).
 6. `./gradlew :headless:run --args="--seed 20260211 --assign gatherer=4 --ticks 60000 --catch-up 1668000 --timeline"` —
    headless reproduction tool: any state is reproducible from seed +
    command list (H1/H2, rules/03 §10). Options: `--balance <file>`,

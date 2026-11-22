@@ -62,6 +62,10 @@ project(':core') {
     dependencies {
         api project(':sim')
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
+        // headless boot smoke test (rules/03 cat. 6): boot the fixture
+        // without a window; natives for Pixmap/Texture loading
+        testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 }
 

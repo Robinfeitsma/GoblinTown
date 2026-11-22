@@ -1,5 +1,6 @@
 package dev.goblintown.gfx;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
@@ -11,6 +12,16 @@ public class DesktopLauncher {
         config.setTitle("GoblinTown");
         config.setWindowedMode(1280, 720);
         config.useVsync(true);
-        new Lwjgl3Application(new GoblinTownGame(), config);
+
+        ApplicationListener app = new GoblinTownGame();
+        // acceptance instruments launched from the same binary (DR-0001
+        // validation task 3); the game itself never sees these args
+        for (int i = 0; i < args.length - 1; i++) {
+            if ("--fixture".equals(args[i]) && "horde".equals(args[i + 1])) {
+                app = new HordeRenderFixture();
+                break;
+            }
+        }
+        new Lwjgl3Application(app, config);
     }
 }
