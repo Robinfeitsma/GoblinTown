@@ -8,6 +8,8 @@ Planned (schemas land with their mechanics-doc phase):
 
 - `economy.json` — **lands with Phase 1**: Phase-1 composite table
   (resources + capacities, roles + per-second rates, XP/level-up tuning).
+  The values come from [docs/08-economy-balance.md](../docs/08-economy-balance.md)
+  (currently **draft** — numbers there are not final until approved).
   Will be split into `roles.json` / `buildings.json` when buildings arrive.
 - `roles.json` — role definitions, base output/tick, level curves
 - `buildings.json` — building costs, production/consumption, tier requirements
