@@ -20,6 +20,7 @@ loaded automatically by Vibe and links every binding rule in `rules/`.
 | [`docs/06-architecture-modularity.md`](docs/06-architecture-modularity.md) | approved | Three-ring architecture, 8-module map, stack demands |
 | [`docs/07-stack-comparison.md`](docs/07-stack-comparison.md) | approved (record) | 6 candidate stacks scored; the input to DR-0001 |
 | [`docs/08-economy-balance.md`](docs/08-economy-balance.md) | approved | Phase-1 pacing targets, scale chain, approved caps/rates/XP curve; OQ-1/OQ-2 resolved |
+| [`docs/09-buildings-construction.md`](docs/09-buildings-construction.md) | draft | Buildings model, construction mechanic, founding build order, `buildings.json` schema |
 
 ### Rules (binding for any LLM working here)
 
