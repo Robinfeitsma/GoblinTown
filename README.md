@@ -81,7 +81,13 @@ graph, so the simulation physically cannot reach the engine (H11, M1–M6).
    (BootSmokeTest: boots + renders 100 headless frames through a GL shim; it
    measures nothing about speed — visual correctness and the 60fps budget
    need this on-GPU run on your hardware).
-6. `./gradlew :headless:run --args="--seed 20260211 --build wood-camp --build-assign wood-camp-000001=8 --ticks 563 --assign gatherer=4 --ticks 60000 --catch-up 1668000 --timeline"` —
+6. `./gradlew :lwjgl3:run --args="--fixture overlay"` — plan-overlay fixture
+   (docs/10, DR-0001 validation 4): clicking zones draws a dungeon route.
+   Headless twins run in `./gradlew :core:test` (PlanOverlayFixtureTest +
+   IsoGridTest: click→append, re-click→truncate, rejections, transform
+   round-trips). **Validation 4 still needs its on-GPU record in DR-0001.**
+   `--fixture hud` starts straight on the town-HUD skeleton.
+7. `./gradlew :headless:run --args="--seed 20260211 --build wood-camp --build-assign wood-camp-000001=8 --ticks 563 --assign gatherer=4 --ticks 60000 --catch-up 1668000 --timeline"` —
    headless reproduction tool: any state is reproducible from seed +
    command list (H1/H2, rules/03 §10). Options run in ARGUMENT ORDER
    (commands interleave with time advances exactly as written):

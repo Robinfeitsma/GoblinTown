@@ -15,10 +15,18 @@ public class DesktopLauncher {
 
         ApplicationListener app = new GoblinTownGame();
         // acceptance instruments launched from the same binary (DR-0001
-        // validation task 3); the game itself never sees these args
+        // validation tasks 3–4); the game itself never sees these args
         for (int i = 0; i < args.length - 1; i++) {
+            if ("--fixture".equals(args[i]) && "overlay".equals(args[i + 1])) {
+                app = new PlanOverlayFixture();
+                break;
+            }
             if ("--fixture".equals(args[i]) && "horde".equals(args[i + 1])) {
                 app = new HordeRenderFixture();
+                break;
+            }
+            if ("--fixture".equals(args[i]) && "hud".equals(args[i + 1])) {
+                app = new GoblinTownGame("hud");
                 break;
             }
         }
