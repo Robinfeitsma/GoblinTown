@@ -1,6 +1,6 @@
 ---
 title: Buildings & Construction
-status: draft
+status: approved
 updated: 2026-11-22
 placeholders: true
 ---
@@ -138,19 +138,29 @@ Full founding build order (1–4) ≈ 4 caps of material ≈ **one 10–20 min
 burst with assignment shuffling** — matches P4. These become the expected
 values in construction-acceptance tests when wired.
 
-## Open questions (user decisions)
+## Open questions
 
-- OQ-1 — Phase 2a abstract slots (recommended) vs grid placement now:
-  abstract keeps map-gen out of the sim until aura-driven placement exists.
-- OQ-2 — Cancel refund policy: **full credit-back of deducted cost**
-  (recommended, simplest deterministic baseline) vs partial/none.
-- OQ-3 — `progressCost` per building as draft table above: confirm or retune
-  (values are pure id-time knobs, tests recompute from JSON).
 - OQ-4 — Do buildings *repair* (post-run attrition?) — deferred with combat;
   no attrition model exists yet.
 
+### Resolved by user review (2026-11-22)
+
+- OQ-1 — **Abstract slots in Phase 2a.** Grid placement + world-gen is a
+  later phase; position data joins via save migration then.
+- OQ-2 — **Full refund on cancel** of the deducted cost.
+- OQ-3 — **Draft build-order numbers confirmed** (450/450/300/450+300 wood/
+  stone; progressCost = cost).
+- Worker-accounting clarification at approval: Phase 2a tracks production
+  assignments and builder allocations as separate pools; the one-goblin-one-
+  job cross-check between them needs global population accounting, which
+  lands with the recruitment/tier phase. Until then the sim never lets a
+  builder contribute production (same tick: builders produce nothing).
+
 ## Changelog
 
+- 2026-11-22 — **Approved by user review**: OQ-1 abstract slots, OQ-2 full
+  refund, OQ-3 numbers confirmed; worker accounting clarified (pool
+  cross-check deferred to recruitment phase). Status draft → approved.
 - 2026-11-22 — Initial draft: abstract-slots Phase 2a scoping, building
   model + `buildings.json` schema, founding build order anchored to docs/08
   caps, worker accounting (builder = labor mode), tier mechanics, OQ-1–4.
