@@ -8,6 +8,10 @@ and code share one git history from now on.
 
 ## Mandatory workflow
 
+0. **Resume point.** Read [`PROJECT-STATE.md`](PROJECT-STATE.md) first: it
+   holds the current phase, decisions awaiting the user, environment facts
+   (machine-specific) and the agreed next steps. Keep it updated every
+   session.
 1. **Rules first.** Before doing any work, read the rules files that match the
    task. They are binding; if a task conflicts with a rule, stop and raise the
    conflict with the user instead of silently deviating.

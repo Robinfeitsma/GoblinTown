@@ -5,7 +5,9 @@ world: start as a lone hero goblin at ground zero, found your tribe, conquer
 the strata, ascend to the surface. Built with **libGDX + Java** (DR-0001).
 
 **Start here if you are an LLM:** read [`AGENTS.md`](AGENTS.md) first — it is
-loaded automatically by Vibe and links every binding rule in `rules/`.
+loaded automatically by Vibe and links every binding rule in `rules/`. For
+current progress, pending user actions and the agreed next steps, read
+[`PROJECT-STATE.md`](PROJECT-STATE.md).
 
 ## Document index (behavior = these documents)
 
